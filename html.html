@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goodnotes Classroom Pricing Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 300px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        input[type=range] {
+            width: 100%;
+            margin: 20px 0;
+        }
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Goodnotes Classroom Pricing</h1>
+        <p>Number of student seats: <span id="seatCount">100</span></p>
+        <input type="range" id="seatSlider" min="0" max="300" value="100" step="1">
+        <div class="price">Total Price: $<span id="totalPrice">500</span></div>
+    </div>
+
+    <script>
+        // Pricing function
+        function calculatePrice(seats) {
+            let price = 0;
+            if (seats <= 100) {
+                price = seats * 5;
+            } else if (seats <= 200) {
+                price = 100 * 5 + (seats - 100) * 4.2;
+            } else {
+                price = 100 * 5 + 100 * 4.2 + (seats - 200) * 3.3;
+            }
+            return price.toFixed(2); // Return formatted price with 2 decimal places
+        }
+
+        // Handle slider change
+        const seatSlider = document.getElementById('seatSlider');
+        const seatCount = document.getElementById('seatCount');
+        const totalPrice = document.getElementById('totalPrice');
+
+        seatSlider.addEventListener('input', function() {
+            const seats = parseInt(seatSlider.value);
+            seatCount.textContent = seats;
+            totalPrice.textContent = calculatePrice(seats);
+        });
+
+        // Initial calculation on page load
+        totalPrice.textContent = calculatePrice(seatSlider.value);
+    </script>
+</body>
+</html>
