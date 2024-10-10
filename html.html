@@ -20,7 +20,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             text-align: center;
-            width: 300px;
+            width: 400px;
         }
         h1 {
             font-size: 24px;
@@ -40,27 +40,40 @@
             margin-top: 20px;
             color: #333;
         }
+        .contact-message {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #ff5722;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Goodnotes Classroom Pricing</h1>
         <p>Number of student seats: <span id="seatCount">100</span></p>
-        <input type="range" id="seatSlider" min="0" max="300" value="100" step="1">
-        <div class="price">Total Price: $<span id="totalPrice">500</span></div>
+        <input type="range" id="seatSlider" min="0" max="2050" value="100" step="10">
+        <div class="price" id="priceDisplay">Total Price: $<span id="totalPrice">500</span></div>
+        <div class="contact-message" id="contactMessage" style="display: none;">
+            Need more than 2000 seats? Contact us to get a quote.
+        </div>
     </div>
 
     <script>
         // Pricing function
         function calculatePrice(seats) {
             let price = 0;
-            if (seats <= 100) {
-                price = seats * 5;
-            } else if (seats <= 200) {
-                price = 100 * 5 + (seats - 100) * 4.2;
-            } else {
-                price = 100 * 5 + 100 * 4.2 + (seats - 200) * 3.3;
+            let remainingSeats = seats;
+            let currentPricePerSeat = 5; // Starting price for the first 100 seats
+            let discountFactor = 0.8; // Each tier gets a 20% discount from the previous tier
+
+            while (remainingSeats > 0) {
+                const seatsInTier = Math.min(100, remainingSeats); // Number of seats in this tier
+                price += seatsInTier * currentPricePerSeat; // Calculate price for this tier
+                remainingSeats -= seatsInTier; // Subtract seats calculated
+                currentPricePerSeat *= discountFactor; // Apply discount for next tier
             }
+
             return price.toFixed(2); // Return formatted price with 2 decimal places
         }
 
@@ -68,11 +81,22 @@
         const seatSlider = document.getElementById('seatSlider');
         const seatCount = document.getElementById('seatCount');
         const totalPrice = document.getElementById('totalPrice');
+        const priceDisplay = document.getElementById('priceDisplay');
+        const contactMessage = document.getElementById('contactMessage');
 
         seatSlider.addEventListener('input', function() {
             const seats = parseInt(seatSlider.value);
             seatCount.textContent = seats;
-            totalPrice.textContent = calculatePrice(seats);
+
+            // Display message for exceeding maximum seats
+            if (seats > 2000) {
+                priceDisplay.style.display = 'none';
+                contactMessage.style.display = 'block';
+            } else {
+                contactMessage.style.display = 'none';
+                priceDisplay.style.display = 'block';
+                totalPrice.textContent = calculatePrice(seats);
+            }
         });
 
         // Initial calculation on page load
