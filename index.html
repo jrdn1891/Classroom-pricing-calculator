@@ -159,6 +159,9 @@
             <label for="defaultDiscount">Default Discount for Tiers (%): </label>
             <input type="number" id="defaultDiscount" class="settings-input" value="20" min="0" max="100">
 
+            <label for="tierSize">Tier Size (Seats): </label>
+            <input type="number" id="tierSize" class="settings-input" value="100" min="1">
+
             <h2>Breakpoint Modifiers</h2>
             <table class="breakpoints-table">
                 <thead>
@@ -183,6 +186,7 @@
         const contactMessage = document.getElementById('contactMessage');
         const startingPriceInput = document.getElementById('startingPrice');
         const defaultDiscountInput = document.getElementById('defaultDiscount');
+        const tierSizeInput = document.getElementById('tierSize'); // New tier size input
         const settingsContainer = document.getElementById('settingsContainer');
         const toggleSettingsButton = document.getElementById('toggleSettings');
         const addBreakpointButton = document.getElementById('addBreakpointButton');
@@ -190,12 +194,12 @@
 
         let breakpoints = []; // Store breakpoints dynamically
 
-        // Function to calculate price based on discount logic and breakpoints
+        // Function to calculate price based on discount logic, tier size, and breakpoints
         function calculatePrice(seats) {
             let price = 0;
             let remainingSeats = seats;
             let pricePerSeat = parseFloat(startingPriceInput.value);  // Use starting price
-            let tierSize = 100;
+            let tierSize = parseInt(tierSizeInput.value);  // Get the tier size from the input field
 
             // Sort breakpoints to ensure correct application order
             const sortedBreakpoints = breakpoints.sort((a, b) => a.tierNumber - b.tierNumber);
@@ -213,6 +217,7 @@
                 if (breakpoint) {
                     currentDiscount = breakpoint.discount / 100; // Overwrite with breakpoint discount
                 }
+                
                 // Apply the current discount
                 pricePerSeat = pricePerSeat * (1 - currentDiscount);
             }
@@ -226,8 +231,7 @@
             seatCount.textContent = seats;
 
             if (seats > 2000) {
-                totalPriceElement.style.display = ''
-                                totalPriceElement.style.display = 'none';
+                totalPriceElement.style.display = 'none';
                 contactMessage.style.display = 'block';
             } else {
                 contactMessage.style.display = 'none';
@@ -238,7 +242,7 @@
 
         // Toggle visibility of advanced settings section
         toggleSettingsButton.addEventListener('click', () => {
-            if (settingsContainer.style.display === 'none' || settingsContainer.style.display === '') {
+                            if (settingsContainer.style.display === 'none' || settingsContainer.style.display === '') {
                 settingsContainer.style.display = 'block';
                 toggleSettingsButton.textContent = 'Hide Advanced Settings';
             } else {
@@ -303,6 +307,7 @@
         seatSlider.addEventListener('input', updatePrice);
         startingPriceInput.addEventListener('input', updatePrice);
         defaultDiscountInput.addEventListener('input', updatePrice);
+        tierSizeInput.addEventListener('input', updatePrice); // Add listener for tier size changes
 
         // Initial price calculation on page load
         updatePrice();
