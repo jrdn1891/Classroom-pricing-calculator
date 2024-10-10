@@ -44,17 +44,17 @@
             cursor: pointer;
         }
         .price {
-            font-size: 32px; /* Matching font size for both 'Total Price' and price value */
+            font-size: 32px;
             font-weight: bold;
             margin-top: 20px;
             color: #007AFF;
         }
         .price-label {
-            font-size: 32px; /* Matching font size for both 'Total Price' and price value */
+            font-size: 32px;
             font-weight: bold;
         }
         .price span {
-            font-size: 20px; /* Smaller font size for 'per year' */
+            font-size: 20px;
             font-weight: normal;
         }
         .contact-message {
@@ -100,6 +100,41 @@
             text-align: center;
             border: 1px solid #ddd;
             border-radius: 4px;
+            margin: 0 10px 20px 10px;
+        }
+        .breakpoints-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .breakpoints-table th, .breakpoints-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .breakpoints-table th {
+            background: #f1f1f1;
+            font-weight: 600;
+        }
+        .breakpoints-table td {
+            background: #ffffff;
+        }
+        .button-add-breakpoint {
+            background-color: #28a745;
+            color: #fff;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .button-remove {
+            background-color: #ff4d4d;
+            color: #fff;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -118,41 +153,70 @@
         <button class="button" id="toggleSettings">Show Advanced Settings</button>
 
         <div class="settings-container" id="settingsContainer">
+            <label for="startingPrice">Starting Price ($): </label>
+            <input type="number" id="startingPrice" class="settings-input" value="5" step="0.01" min="0">
+            
             <label for="defaultDiscount">Default Discount for Tiers (%): </label>
             <input type="number" id="defaultDiscount" class="settings-input" value="20" min="0" max="100">
+
+            <h2>Breakpoint Modifiers</h2>
+            <table class="breakpoints-table">
+                <thead>
+                    <tr>
+                        <th>Tier Number</th>
+                        <th>Discount (%)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="breakpointsTableBody">
+                    <!-- Breakpoints will be dynamically added here -->
+                </tbody>
+            </table>
+            <button class="button-add-breakpoint" id="addBreakpointButton">Add Breakpoint</button>
         </div>
     </div>
 
     <script>
         const seatSlider = document.getElementById('seatSlider');
         const seatCount = document.getElementById('seatCount');
-        const totalPriceElement = document.getElementById('totalPrice');  // Correct reference to totalPrice element
+        const totalPriceElement = document.getElementById('totalPrice');
         const contactMessage = document.getElementById('contactMessage');
+        const startingPriceInput = document.getElementById('startingPrice');
         const defaultDiscountInput = document.getElementById('defaultDiscount');
         const settingsContainer = document.getElementById('settingsContainer');
         const toggleSettingsButton = document.getElementById('toggleSettings');
+        const addBreakpointButton = document.getElementById('addBreakpointButton');
+        const breakpointsTableBody = document.getElementById('breakpointsTableBody');
 
-        // Function to calculate price based on default discount value
+        let breakpoints = []; // Store breakpoints dynamically
+
+        // Function to calculate price based on discount logic and breakpoints
         function calculatePrice(seats) {
             let price = 0;
             let remainingSeats = seats;
-            let pricePerSeat = 5.00;  // Initial price for the first 100 seats
+            let pricePerSeat = parseFloat(startingPriceInput.value);  // Use starting price
             let tierSize = 100;
-            const discount = parseFloat(defaultDiscountInput.value) / 100;
+            const defaultDiscount = parseFloat(defaultDiscountInput.value) / 100;
 
-            while (remainingSeats > 0) {
+            // Apply discount and breakpoints for each tier
+            for (let tier = 1; remainingSeats > 0; tier++) {
                 const seatsInTier = Math.min(tierSize, remainingSeats);
                 price += seatsInTier * pricePerSeat;
                 remainingSeats -= seatsInTier;
 
-                // Apply discount for the next tier
-                pricePerSeat = pricePerSeat * (1 - discount);
+                // Check if a custom discount breakpoint is set for this tier
+                const breakpoint = breakpoints.find(bp => bp.tierNumber === tier);
+                if (breakpoint) {
+                    pricePerSeat = pricePerSeat * (1 - breakpoint.discount / 100);
+                } else {
+                    pricePerSeat = pricePerSeat * (1 - defaultDiscount); // Apply default discount
+                }
             }
 
             return price.toFixed(2);
         }
 
-        // Update price display when the slider or discount value changes
+        // Function to update price display
         function updatePrice() {
             const seats = parseInt(seatSlider.value);
             seatCount.textContent = seats;
@@ -163,11 +227,11 @@
             } else {
                 contactMessage.style.display = 'none';
                 totalPriceElement.style.display = 'inline';
-                totalPriceElement.textContent = `$${calculatePrice(seats)}`;  // Correctly update the total price element
+                totalPriceElement.textContent = `$${calculatePrice(seats)}`;
             }
         }
 
-        // Toggle visibility of the advanced settings section
+        // Toggle visibility of advanced settings section
         toggleSettingsButton.addEventListener('click', () => {
             if (settingsContainer.style.display === 'none' || settingsContainer.style.display === '') {
                 settingsContainer.style.display = 'block';
@@ -178,8 +242,62 @@
             }
         });
 
+        // Function to add a new breakpoint row
+        function addBreakpointRow(tierNumber = 1, discount = 15) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="number" class="settings-input" value="${tierNumber}" min="1" step="1" data
+                                <td><input type="number" class="settings-input" value="${tierNumber}" min="1" step="1" data-tier="number"></td>
+                <td><input type="number" class="settings-input" value="${discount}" min="0" step="0.1" data-tier="discount"></td>
+                <td><button class="button-remove" onclick="removeBreakpointRow(this)">Remove</button></td>
+            `;
+            breakpointsTableBody.appendChild(row);
+
+            // Attach event listeners to the newly created inputs
+            row.querySelector('[data-tier="number"]').addEventListener('input', updateBreakpoint);
+            row.querySelector('[data-tier="discount"]').addEventListener('input', updateBreakpoint);
+        }
+
+        // Function to update the breakpoint values in the breakpoints array
+        function updateBreakpoint(event) {
+            const row = event.target.closest('tr');
+            const tierNumber = parseInt(row.querySelector('[data-tier="number"]').value);
+            const discount = parseFloat(row.querySelector('[data-tier="discount"]').value);
+
+            // Check if the breakpoint already exists, if so, update it
+            const existingBreakpoint = breakpoints.find(bp => bp.tierNumber === tierNumber);
+            if (existingBreakpoint) {
+                existingBreakpoint.discount = discount;
+            } else {
+                // If the breakpoint does not exist, add a new one
+                breakpoints.push({ tierNumber, discount });
+            }
+
+            updatePrice(); // Update price calculation based on new breakpoints
+        }
+
+        // Function to remove a breakpoint row
+        function removeBreakpointRow(button) {
+            const row = button.closest('tr');
+            const tierNumber = parseInt(row.querySelector('[data-tier="number"]').value);
+
+            // Remove the breakpoint from the array
+            breakpoints = breakpoints.filter(bp => bp.tierNumber !== tierNumber);
+            row.remove();
+
+            updatePrice(); // Update price calculation based on removed breakpoints
+        }
+
+        // Event listener for adding a new breakpoint
+        addBreakpointButton.addEventListener('click', () => {
+            // By default, add a new row with the next tier number and a 15% discount
+            const nextTierNumber = breakpoints.length > 0 ? Math.max(...breakpoints.map(bp => bp.tierNumber)) + 1 : 1;
+            addBreakpointRow(nextTierNumber, 15);
+        });
+
         // Attach event listeners to update price dynamically
         seatSlider.addEventListener('input', updatePrice);
+        startingPriceInput.addEventListener('input', updatePrice);
         defaultDiscountInput.addEventListener('input', updatePrice);
 
         // Initial price calculation on page load
