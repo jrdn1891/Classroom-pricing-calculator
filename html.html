@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goodnotes Classroom Pricing Calculator</title>
+    <title>Goodnotes Classroom Pricing Tool</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #45BFDB; /* Updated Goodnotes teal color */
+            background-color: #45BFDB; /* Goodnotes teal color */
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
+            padding-top: 40px;
             height: 100vh;
             margin: 0;
             color: #333;
@@ -21,8 +22,11 @@
             padding: 40px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            margin-bottom: 20px;
+        }
+        .pricing-title {
             text-align: center;
-            width: 450px;
         }
         h1 {
             font-size: 28px;
@@ -36,14 +40,22 @@
         }
         input[type=range] {
             width: 100%;
-            margin: 30px 0;
+            margin: 20px 0;
             cursor: pointer;
         }
         .price {
-            font-size: 26px;
+            font-size: 32px; /* Matching font size for both 'Total Price' and price value */
             font-weight: bold;
             margin-top: 20px;
             color: #007AFF;
+        }
+        .price-label {
+            font-size: 32px; /* Matching font size for both 'Total Price' and price value */
+            font-weight: bold;
+        }
+        .price span {
+            font-size: 20px; /* Smaller font size for 'per year' */
+            font-weight: normal;
         }
         .contact-message {
             font-size: 22px;
@@ -55,79 +67,123 @@
             color: #ff5722;
             text-decoration: underline;
         }
-        .tooltip {
+        .button {
             display: inline-block;
-            position: relative;
-        }
-        .tooltip:hover::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #333;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            background-color: #007AFF;
             color: #fff;
-            padding: 5px 10px;
-            border-radius: 5px;
-            white-space: nowrap;
-            font-size: 14px;
-            z-index: 10;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .settings-container {
+            display: none;
+            margin-top: 20px;
+            background: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .settings-container label {
+            font-size: 18px;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+        .settings-input {
+            width: 80px;
+            padding: 6px;
+            font-size: 16px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Goodnotes Classroom Pricing</h1>
-        <p>Number of student seats: <span id="seatCount">100</span> <span class="tooltip" data-tooltip="Adjust the number of seats in increments of 10">ℹ️</span></p>
-        <input type="range" id="seatSlider" min="0" max="2050" value="100" step="10">
-        <div class="price" id="priceDisplay">Total Price: $<span id="totalPrice">500</span></div>
-        <div class="contact-message" id="contactMessage" style="display: none;">
-            Need more than 2000 seats? <a href="#">Contact us</a> to get a quote.
+        <div class="pricing-title">
+            <h1>Goodnotes Classroom Pricing Calculator</h1>
+            <p>Number of student seats: <span id="seatCount">100</span> seats</p>
+            <input type="range" id="seatSlider" min="0" max="2050" value="100" step="10">
+            <div class="price-label">Total Price: <span class="price" id="totalPrice">$500</span> <span>per year</span></div>
+            <div class="contact-message" id="contactMessage" style="display: none;">
+                Need more than 2000 seats? <a href="#">Contact us</a> to get a quote.
+            </div>
+        </div>
+
+        <button class="button" id="toggleSettings">Show Advanced Settings</button>
+
+        <div class="settings-container" id="settingsContainer">
+            <label for="defaultDiscount">Default Discount for Tiers (%): </label>
+            <input type="number" id="defaultDiscount" class="settings-input" value="20" min="0" max="100">
         </div>
     </div>
 
     <script>
-        // Pricing function
+        const seatSlider = document.getElementById('seatSlider');
+        const seatCount = document.getElementById('seatCount');
+        const totalPriceElement = document.getElementById('totalPrice');  // Correct reference to totalPrice element
+        const contactMessage = document.getElementById('contactMessage');
+        const defaultDiscountInput = document.getElementById('defaultDiscount');
+        const settingsContainer = document.getElementById('settingsContainer');
+        const toggleSettingsButton = document.getElementById('toggleSettings');
+
+        // Function to calculate price based on default discount value
         function calculatePrice(seats) {
             let price = 0;
             let remainingSeats = seats;
-            let currentPricePerSeat = 5; // Starting price for the first 100 seats
-            let discountFactor = 0.8; // Each tier gets a 20% discount from the previous tier
+            let pricePerSeat = 5.00;  // Initial price for the first 100 seats
+            let tierSize = 100;
+            const discount = parseFloat(defaultDiscountInput.value) / 100;
 
             while (remainingSeats > 0) {
-                const seatsInTier = Math.min(100, remainingSeats); // Number of seats in this tier
-                price += seatsInTier * currentPricePerSeat; // Calculate price for this tier
-                remainingSeats -= seatsInTier; // Subtract seats calculated
-                currentPricePerSeat *= discountFactor; // Apply discount for next tier
+                const seatsInTier = Math.min(tierSize, remainingSeats);
+                price += seatsInTier * pricePerSeat;
+                remainingSeats -= seatsInTier;
+
+                // Apply discount for the next tier
+                pricePerSeat = pricePerSeat * (1 - discount);
             }
 
-            return price.toFixed(2); // Return formatted price with 2 decimal places
+            return price.toFixed(2);
         }
 
-        // Handle slider change
-        const seatSlider = document.getElementById('seatSlider');
-        const seatCount = document.getElementById('seatCount');
-        const totalPrice = document.getElementById('totalPrice');
-        const priceDisplay = document.getElementById('priceDisplay');
-        const contactMessage = document.getElementById('contactMessage');
-
-        seatSlider.addEventListener('input', function() {
+        // Update price display when the slider or discount value changes
+        function updatePrice() {
             const seats = parseInt(seatSlider.value);
             seatCount.textContent = seats;
 
-            // Display message for exceeding maximum seats
             if (seats > 2000) {
-                priceDisplay.style.display = 'none';
+                totalPriceElement.style.display = 'none';
                 contactMessage.style.display = 'block';
             } else {
                 contactMessage.style.display = 'none';
-                priceDisplay.style.display = 'block';
-                totalPrice.textContent = calculatePrice(seats);
+                totalPriceElement.style.display = 'inline';
+                totalPriceElement.textContent = `$${calculatePrice(seats)}`;  // Correctly update the total price element
+            }
+        }
+
+        // Toggle visibility of the advanced settings section
+        toggleSettingsButton.addEventListener('click', () => {
+            if (settingsContainer.style.display === 'none' || settingsContainer.style.display === '') {
+                settingsContainer.style.display = 'block';
+                toggleSettingsButton.textContent = 'Hide Advanced Settings';
+            } else {
+                settingsContainer.style.display = 'none';
+                toggleSettingsButton.textContent = 'Show Advanced Settings';
             }
         });
 
-        // Initial calculation on page load
-        totalPrice.textContent = calculatePrice(seatSlider.value);
+        // Attach event listeners to update price dynamically
+        seatSlider.addEventListener('input', updatePrice);
+        defaultDiscountInput.addEventListener('input', updatePrice);
+
+        // Initial price calculation on page load
+        updatePrice();
     </script>
 </body>
 </html>
