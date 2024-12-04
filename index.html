@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goodnotes Classroom Pricing Tool</title>
+    <title>Pricing Tool with Breakpoints</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #45BFDB; /* Goodnotes teal color */
+            background-color: #45BFDB;
             display: flex;
             justify-content: center;
             align-items: flex-start;
             padding-top: 40px;
-            height: 100vh;
             margin: 0;
+            height: 100vh;
             color: #333;
         }
         .container {
@@ -23,16 +23,12 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             width: 800px;
-            margin-bottom: 20px;
-        }
-        .pricing-title {
-            text-align: center;
         }
         h1 {
+            text-align: center;
             font-size: 28px;
             margin-bottom: 16px;
             font-weight: 600;
-            color: #1a1a1a;
         }
         p {
             font-size: 18px;
@@ -41,298 +37,204 @@
         input[type=range] {
             width: 100%;
             margin: 20px 0;
-            cursor: pointer;
         }
         .price {
             font-size: 32px;
             font-weight: bold;
-            margin-top: 20px;
-            color: #007AFF;
+            text-align: center;
+            margin: 20px 0;
         }
-        .price-label {
-            font-size: 32px;
-            font-weight: bold;
-        }
-        .price span {
-            font-size: 20px;
-            font-weight: normal;
+        .average-price {
+            font-size: 16px;
+            color: #555;
+            text-align: center;
+            margin-top: -10px;
         }
         .contact-message {
-            font-size: 22px;
-            font-weight: 600;
-            margin-top: 20px;
+            font-size: 18px;
             color: #ff5722;
-        }
-        .contact-message a {
-            color: #ff5722;
-            text-decoration: underline;
-        }
-        .button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: 500;
-            background-color: #007AFF;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
         }
         .settings-container {
-            display: none;
             margin-top: 20px;
             background: #f9f9f9;
             padding: 20px;
-            border: 1px solid #e1e1e1;
-            border-radius: 8px;
-        }
-        .settings-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        .settings-column {
-            flex: 1 1 200px; /* Minimum width for each column */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            background: #fff;
         }
-        .settings-column label {
-            font-size: 18px;
-            font-weight: 500;
-            margin-bottom: 10px;
-        }
-        .settings-column input {
-            width: 100px;
-            padding: 6px;
-            font-size: 16px;
-            text-align: center;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .breakpoints-table {
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 20px;
         }
-        .breakpoints-table th, .breakpoints-table td {
-            padding: 12px;
+        th, td {
+            padding: 10px;
             text-align: center;
             border: 1px solid #ddd;
         }
-        .breakpoints-table th {
-            background: #f1f1f1;
-            font-weight: 600;
+        th {
+            background-color: #f1f1f1;
+            font-weight: bold;
         }
-        .breakpoints-table td {
-            background: #ffffff;
-        }
-        .breakpoints-table input {
-            width: 100px; /* Match width of other inputs */
+        input[type="number"] {
+            width: 100px;
             padding: 6px;
-            font-size: 16px;
             text-align: center;
+            font-size: 16px;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
-        .button-add-breakpoint {
-            background-color: #28a745;
-            color: #fff;
-            padding: 8px 16px;
+        .button {
+            background-color: #007AFF;
+            color: white;
+            padding: 10px 20px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
+            font-size: 16px;
             cursor: pointer;
-            margin-top: 10px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto; /* Center the button */
         }
         .button-remove {
             background-color: #ff4d4d;
-            color: #fff;
+            color: white;
             padding: 6px 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
+        .button-add {
+            margin: 10px auto;
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="pricing-title">
-            <h1>Goodnotes Classroom Pricing Calculator</h1>
-            <p>Number of student seats: <span id="seatCount">100</span> seats</p>
-            <input type="range" id="seatSlider" min="0" max="2050" value="100" step="10">
-            <div class="price-label">Total Price: <span class="price" id="totalPrice">$500</span> <span>per year</span></div>
-            <div class="contact-message" id="contactMessage" style="display: none;">
-                Need more than 2000 seats? <a href="#">Contact us</a> to get a quote.
-            </div>
-        </div>
+        <h1>Pricing Tool</h1>
+        <p>Number of seats: <span id="seatCount">0</span></p>
+        <input type="range" id="seatSlider" min="0" max="2100" value="0" step="10">
+        <div class="price">Total Price: $<span id="totalPrice">0</span></div>
+        <div class="average-price" id="averagePrice">(Average price per seat: $0)</div>
+        <div class="contact-message" id="contactMessage">Need more than 2000 seats? <a href="#">Contact our team</a>.</div>
 
-        <button class="button" id="toggleSettings">Show Advanced Settings</button>
-
-        <div class="settings-container" id="settingsContainer">
-            <div class="settings-row">
-                <div class="settings-column">
-                    <label for="startingPrice">Starting Price ($): </label>
-                    <input type="number" id="startingPrice" class="settings-input" value="5" step="0.01" min="0">
-                </div>
-                <div class="settings-column">
-                    <label for="defaultDiscount">Default Discount (%): </label>
-                    <input type="number" id="defaultDiscount" class="settings-input" value="20" min="0" max="100">
-                </div>
-                <div class="settings-column">
-                    <label for="tierSize">Tier Size (Seats): </label>
-                    <input type="number" id="tierSize" class="settings-input" value="100" min="1">
-                </div>
-            </div>
-
-            <h2>Breakpoint Modifiers</h2>
-            <table class="breakpoints-table">
+        <button class="button" id="toggleSettings">Toggle Advanced Settings</button>
+        <div class="settings-container" id="settingsContainer" style="display: none;">
+            <label for="basePrice">Base Price ($): </label>
+            <input type="number" id="basePrice" value="5" step="0.01" min="0">
+            <table>
                 <thead>
                     <tr>
-                        <th>Tier Number</th>
+                        <th>From (Seats)</th>
+                        <th>To (Seats)</th>
                         <th>Discount (%)</th>
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody id="breakpointsTableBody">
-                    <!-- Breakpoints will be dynamically added here -->
-                </tbody>
+                <tbody id="breakpointsTable"></tbody>
             </table>
-            <button class="button-add-breakpoint" id="addBreakpointButton">Add Breakpoint</button>
+            <button class="button button-add" id="addBreakpoint">Add a Tier</button>
         </div>
     </div>
 
     <script>
-        const seatSlider = document.getElementById('seatSlider');
-        const seatCount = document.getElementById('seatCount');
-        const totalPriceElement = document.getElementById('totalPrice');
-        const contactMessage = document.getElementById('contactMessage');
-        const startingPriceInput = document.getElementById('startingPrice');
-        const defaultDiscountInput = document.getElementById('defaultDiscount');
-        const tierSizeInput = document.getElementById('tierSize');
-        const settingsContainer = document.getElementById('settingsContainer');
-        const toggleSettingsButton = document.getElementById('toggleSettings');
-        const addBreakpointButton = document.getElementById('addBreakpointButton');
-        const breakpointsTableBody = document.getElementById('breakpointsTableBody');
+        const seatSlider = document.getElementById("seatSlider");
+        const seatCount = document.getElementById("seatCount");
+        const totalPriceElement = document.getElementById("totalPrice");
+        const averagePriceElement = document.getElementById("averagePrice");
+        const contactMessage = document.getElementById("contactMessage");
+        const basePriceInput = document.getElementById("basePrice");
+        const toggleSettings = document.getElementById("toggleSettings");
+        const settingsContainer = document.getElementById("settingsContainer");
+        const breakpointsTable = document.getElementById("breakpointsTable");
+        const addBreakpointButton = document.getElementById("addBreakpoint");
 
-        let breakpoints = []; // Store breakpoints dynamically
+        let breakpoints = []; // Stores the breakpoints
 
+        // Function to calculate the total price
         function calculatePrice(seats) {
-            let price = 0;
-            let remainingSeats = seats;
-            let pricePerSeat = parseFloat(startingPriceInput.value);
-            let tierSize = parseInt(tierSizeInput.value);
+            let basePrice = parseFloat(basePriceInput.value);
+            let totalPrice = 0;
 
-            const sortedBreakpoints = breakpoints.sort((a, b) => a.tierNumber - b.tierNumber);
-            let currentDiscount = parseFloat(defaultDiscountInput.value) / 100;
+            breakpoints.sort((a, b) => a.from - b.from);
 
-            for (let tier = 1; remainingSeats > 0; tier++) {
-                const seatsInTier = Math.min(tierSize, remainingSeats);
-                price += seatsInTier * pricePerSeat;
-                remainingSeats -= seatsInTier;
-
-                const breakpoint = sortedBreakpoints.find(bp => bp.tierNumber === tier);
-                if (breakpoint) {
-                    currentDiscount = breakpoint.discount / 100;
-                }
-                pricePerSeat = pricePerSeat * (1 - currentDiscount);
+            for (const bp of breakpoints) {
+                if (seats <= 0) break;
+                const applicableSeats = Math.min(bp.to - bp.from + 1, seats);
+                const discountedPrice = basePrice * (1 - bp.discount / 100);
+                totalPrice += applicableSeats * discountedPrice;
+                seats -= applicableSeats;
             }
 
-            return price.toFixed(2);
+            return totalPrice.toFixed(2);
         }
 
+        // Function to update the price dynamically
         function updatePrice() {
             const seats = parseInt(seatSlider.value);
-            seatCount.textContent = seats;
-
             if (seats > 2000) {
-                totalPriceElement.style.display = 'none';
-                contactMessage.style.display = 'block';
+                totalPriceElement.textContent = "Upon Request";
+                averagePriceElement.textContent = "(Average price per seat: Upon Request)";
+                contactMessage.style.display = "block";
             } else {
-                contactMessage.style.display = 'none';
-                totalPriceElement.style.display = 'inline';
-                totalPriceElement.textContent = `$${calculatePrice(seats)}`;
+                contactMessage.style.display = "none";
+                seatCount.textContent = seats;
+                const totalPrice = calculatePrice(seats);
+                totalPriceElement.textContent = totalPrice;
+                const averagePrice = (seats > 0) ? (totalPrice / seats).toFixed(2) : 0;
+                averagePriceElement.textContent = `(Average price per seat: $${averagePrice})`;
             }
         }
-
-        // Toggle visibility of advanced settings section
-        toggleSettingsButton.addEventListener('click', () => {
-            if (settingsContainer.style.display === 'none' || settingsContainer.style.display === '') {
-                settingsContainer.style.display = 'block';
-                toggleSettingsButton.textContent = 'Hide Advanced Settings';
-            } else {
-                settingsContainer.style.display = 'none';
-                toggleSettingsButton.textContent = 'Show Advanced Settings';
-            }
-        });
 
         // Function to add a new breakpoint row
-        function addBreakpointRow(tierNumber = 1, discount = 15) {
-            const row = document.createElement('tr');
+        function addBreakpointRow(from = 1, to = 100, discount = 0) {
+            const row = document.createElement("tr");
+
             row.innerHTML = `
-                <td><input type="number" class="settings-input" value="${tierNumber}" min="1" step="1" data-tier="number"></td>
-                <td><input type="number" class="settings-input" value="${discount}" min="0" step="0.1" data-tier="discount"></td>
+                <td><input type="number" value="${from}" min="1" step="1" class="from"></td>
+                <td><input type="number" value="${to}" min="${from + 1}" step="1" class="to"></td>
+                <td><input type="number" value="${discount}" min="0" max="100" step="1" class="discount"></td>
                 <td><button class="button-remove" onclick="removeBreakpointRow(this)">Remove</button></td>
             `;
-            breakpointsTableBody.appendChild(row);
 
-            // Attach event listeners to the newly created inputs
-            row.querySelector('[data-tier="number"]').addEventListener('input', updateBreakpoint);
-            row.querySelector('[data-tier="discount"]').addEventListener('input', updateBreakpoint);
+            row.querySelectorAll("input").forEach(input =>
+                input.addEventListener("input", updateBreakpoints)
+            );
+
+            breakpointsTable.appendChild(row);
+            updateBreakpoints();
         }
 
-        // Function to update the breakpoint values in the breakpoints array
-        function updateBreakpoint(event) {
-            const row = event.target.closest('tr');
-            const tierNumber = parseInt(row.querySelector('[data-tier="number"]').value);
-            const discount = parseFloat(row.querySelector('[data-tier="discount"]').value);
-
-            // Check if the breakpoint already exists, if so, update it
-            const existingBreakpoint = breakpoints.find(bp => bp.tierNumber === tierNumber);
-            if (existingBreakpoint) {
-                existingBreakpoint.discount = discount;
-            } else {
-                // If the breakpoint does not exist, add a new one
-                breakpoints.push({ tierNumber, discount });
-            }
-
-            updatePrice(); // Update price calculation based on new breakpoints
+        // Function to update breakpoints from the table
+        function updateBreakpoints() {
+            breakpoints = Array.from(breakpointsTable.querySelectorAll("tr")).map(row => ({
+                from: parseInt(row.querySelector(".from").value),
+                to: parseInt(row.querySelector(".to").value),
+                discount: parseFloat(row.querySelector(".discount").value),
+            }));
+            updatePrice();
         }
 
         // Function to remove a breakpoint row
         function removeBreakpointRow(button) {
-            const row = button.closest('tr');
-            const tierNumber = parseInt(row.querySelector('[data-tier="number"]').value);
-
-            // Remove the breakpoint from the array
-            breakpoints = breakpoints.filter(bp => bp.tierNumber !== tierNumber);
-            row.remove();
-
-            updatePrice(); // Update price calculation based on removed breakpoints
+            const row = button.parentElement.parentElement;
+            breakpointsTable.removeChild(row);
+            updateBreakpoints();
         }
 
-        // Event listener for adding a new breakpoint
-        addBreakpointButton.addEventListener('click', () => {
-            // By default, add a new row with the next tier number and a 15% discount
-            const nextTierNumber = breakpoints.length > 0 ? Math.max(...breakpoints.map(bp => bp.tierNumber)) + 1 : 1;
-            addBreakpointRow(nextTierNumber, 15);
+        // Event Listeners
+        seatSlider.addEventListener("input", updatePrice);
+        basePriceInput.addEventListener("input", updatePrice);
+        addBreakpointButton.addEventListener("click", () => addBreakpointRow());
+        toggleSettings.addEventListener("click", () => {
+            settingsContainer.style.display = settingsContainer.style.display === "none" ? "block" : "none";
         });
 
-        // Attach event listeners to update price dynamically
-        seatSlider.addEventListener('input', updatePrice);
-        startingPriceInput.addEventListener('input', updatePrice);
-        defaultDiscountInput.addEventListener('input', updatePrice);
-        tierSizeInput.addEventListener('input', updatePrice); // Add listener for tier size changes
-
-        // Initial price calculation on page load
+        // Initial Setup
+        addBreakpointRow(1, 300, 0);
+        addBreakpointRow(301, 500, 40);
+        addBreakpointRow(501, 1000, 50);
+        addBreakpointRow(1001, 2000, 75);
         updatePrice();
     </script>
 </body>
